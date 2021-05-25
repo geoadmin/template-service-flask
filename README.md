@@ -101,13 +101,6 @@ make dockerrun
 ```
 
 This will serve the application with the wsgi server, inside a container.
-To stop serving through containers,
-
-```bash
-make shutdown
-```
-
-Is the command you're looking for.
 
 ## Docker
 
