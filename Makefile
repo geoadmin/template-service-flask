@@ -6,10 +6,6 @@ SERVICE_NAME := template
 
 CURRENT_DIR := $(shell pwd)
 
-# Test report configuration
-TEST_REPORT_DIR ?= $(CURRENT_DIR)/tests/report
-TEST_REPORT_FILE ?= nose2-junit.xml
-
 # Docker metadata
 GIT_HASH = `git rev-parse HEAD`
 GIT_HASH_SHORT = `git rev-parse --short HEAD`
@@ -20,7 +16,7 @@ AUTHOR = $(USER)
 
 # general targets timestamps
 TIMESTAMPS = .timestamps
-REQUIREMENTS := $(TIMESTAMPS) ${VOLUMES_MINIO} $(LOGS_DIR) $(PIP_FILE) $(PIP_FILE_LOCK)
+REQUIREMENTS := $(TIMESTAMPS) $(PIP_FILE) $(PIP_FILE_LOCK)
 
 # Docker variables
 DOCKER_REGISTRY = 974517877189.dkr.ecr.eu-central-1.amazonaws.com
@@ -133,9 +129,8 @@ format-lint: format lint
 # Test target
 
 .PHONY: test
-test: $(TEST_REPORT_DIR)
-	mkdir -p $(TEST_REPORT_DIR)
-	$(NOSE) -c tests/unittest.cfg --verbose --junit-xml-path $(TEST_REPORT_DIR)/$(TEST_REPORT_FILE) -s tests/
+test:
+	$(NOSE) -c tests/unittest.cfg --verbose -s tests/
 
 
 # Serve targets. Using these will run the application on your local machine. You can either serve with a wsgi front (like it would be within the container), or without.
@@ -212,7 +207,6 @@ clean_venv:
 clean: clean_venv
 	@# clean python cache files
 	find . -name __pycache__ -type d -print0 | xargs -I {} -0 rm -rf "{}"
-	rm -rf $(TEST_REPORT_DIR)
 	rm -rf $(TIMESTAMPS)
 
 
