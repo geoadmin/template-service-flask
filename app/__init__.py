@@ -1,10 +1,12 @@
 import logging
 import re
+import time
 
 from werkzeug.exceptions import HTTPException
 
 from flask import Flask
 from flask import abort
+from flask import g
 from flask import request
 
 from app.helpers.utils import ALLOWED_DOMAINS_PATTERN
@@ -24,6 +26,7 @@ app.wsgi_app = ReverseProxy(app.wsgi_app, script_name='/')
 # the route might not be logged if another method reject the request.
 @app.before_request
 def log_route():
+    g.setdefault('request_started', time.time())
     route_logger.info('%s %s', request.method, request.path)
 
 
@@ -47,6 +50,27 @@ def add_cors_header(response):
     ):
         response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return response
+
+
+# NOTE it is better to have this method registered last (after add_cors_header) otherwise
+# the response might not be correct (e.g. headers added in another after_request hook).
+@app.before_request
+@app.after_request
+def log_response(response):
+    logger.info(
+        "%s %s - %s",
+        request.method,
+        request.path,
+        response.status,
+        extra={
+            'response':
+                {
+                    "status_code": response.status_code, "headers": dict(response.headers.items())
+                },
+            "duration": time.time() - g.get('request_started', time.time())
+        }
+    )
     return response
 
 
