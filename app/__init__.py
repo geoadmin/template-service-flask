@@ -55,7 +55,6 @@ def add_cors_header(response):
 
 # NOTE it is better to have this method registered last (after add_cors_header) otherwise
 # the response might not be correct (e.g. headers added in another after_request hook).
-@app.before_request
 @app.after_request
 def log_response(response):
     logger.info(
