@@ -57,7 +57,7 @@ def add_cors_header(response):
 # the response might not be correct (e.g. headers added in another after_request hook).
 @app.after_request
 def log_response(response):
-    logger.info(
+    route_logger.info(
         "%s %s - %s",
         request.method,
         request.path,
