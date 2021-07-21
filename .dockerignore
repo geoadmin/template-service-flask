@@ -3,6 +3,7 @@
 .github
 .gitignore
 .gitmodules
+**/*.orig
 **/*.md
 
 # Docker
@@ -11,8 +12,8 @@ docker-compose.yml.in
 .docker
 
 # Python
-*.pyc
-__pycache__
+**/*.pyc
+**/__pycache__
 
 # Files not used within docker
 tests
