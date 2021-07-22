@@ -34,6 +34,7 @@ PIP_FILE_LOCK = Pipfile.lock
 
 # default configuration
 HTTP_PORT ?= 5000
+LOGS_DIR ?= $(CURRENT_DIR)/logs
 
 # Commands
 PIPENV_RUN := pipenv run
@@ -84,12 +85,14 @@ help:
 
 .PHONY: dev
 dev: $(REQUIREMENTS)
+	mkdir -p -m 777 $(LOGS_DIR)
 	pipenv install --dev
 	pipenv shell
 
 
 .PHONY: setup
 setup: $(REQUIREMENTS)
+	mkdir -p -m 777 $(LOGS_DIR)
 	pipenv install
 	pipenv shell
 
@@ -137,12 +140,12 @@ test:
 
 .PHONY: serve
 serve:
-	FLASK_APP=service_launcher FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
+	LOGS_DIR=$(LOGS_DIR) FLASK_APP=service_launcher FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
 
 
 .PHONY: gunicornserve
 gunicornserve:
-	$(PYTHON) wsgi.py
+	LOGS_DIR=$(LOGS_DIR) $(PYTHON) wsgi.py
 
 
 # Docker related functions.
@@ -170,7 +173,7 @@ dockerpush: dockerbuild
 .PHONY: dockerrun
 dockerrun: dockerbuild
 	echo "Starting docker container and mapped its 8080 port to $(HTTP_PORT); http://localhost:$(HTTP_PORT)"
-	docker run -it -p $(HTTP_PORT):8080 $(DOCKER_IMG_LOCAL_TAG)
+	LOGS_DIR=/app/logs docker run -it -v $(LOGS_DIR):/app/logs -p $(HTTP_PORT):8080 $(DOCKER_IMG_LOCAL_TAG)
 
 
 # Spec targets
@@ -208,6 +211,7 @@ clean: clean_venv
 	@# clean python cache files
 	find . -name __pycache__ -type d -print0 | xargs -I {} -0 rm -rf "{}"
 	rm -rf $(TIMESTAMPS)
+	rm -rf $(LOGS_DIR)
 
 
 # Actual builds targets with dependencies
