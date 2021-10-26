@@ -13,7 +13,7 @@ from app.settings import LOGS_DIR
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_DOMAINS_PATTERN = '({})'.format('|'.join(ALLOWED_DOMAINS))
+ALLOWED_DOMAINS_PATTERN = f"({'|'.join(ALLOWED_DOMAINS)})"
 
 
 def make_error_msg(code, msg):

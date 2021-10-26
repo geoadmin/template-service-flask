@@ -133,19 +133,19 @@ format-lint: format lint
 
 .PHONY: test
 test:
-	$(NOSE) -c tests/unittest.cfg --verbose -s tests/
+	ENV_FILE=./.env.test $(NOSE) -c tests/unittest.cfg --verbose -s tests/
 
 
 # Serve targets. Using these will run the application on your local machine. You can either serve with a wsgi front (like it would be within the container), or without.
 
 .PHONY: serve
 serve:
-	LOGS_DIR=$(LOGS_DIR) FLASK_APP=service_launcher FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
+	ENV_FILE=./.env.local LOGS_DIR=$(LOGS_DIR) FLASK_APP=service_launcher FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
 
 
 .PHONY: gunicornserve
 gunicornserve:
-	LOGS_DIR=$(LOGS_DIR) $(PYTHON) wsgi.py
+	ENV_FILE=./.env.local LOGS_DIR=$(LOGS_DIR) $(PYTHON) wsgi.py
 
 
 # Docker related functions.
@@ -173,8 +173,11 @@ dockerpush: dockerbuild
 .PHONY: dockerrun
 dockerrun: dockerbuild
 	echo "Starting docker container and mapped its 8080 port to $(HTTP_PORT); http://localhost:$(HTTP_PORT)"
-	LOGS_DIR=/app/logs docker run -it -v $(LOGS_DIR):/app/logs -p $(HTTP_PORT):8080 $(DOCKER_IMG_LOCAL_TAG)
-
+	docker run \
+		-it -v $(LOGS_DIR):/app/logs \
+		-p $(HTTP_PORT):8080 \
+		-e ALLOWED_DOMAINS="$(ALLOWED_DOMAINS)" \
+	 	$(DOCKER_IMG_LOCAL_TAG)
 
 # Spec targets
 
