@@ -1,8 +1,9 @@
+import os
+
 from gunicorn.app.base import BaseApplication
 
 from app import app as application
 from app.helpers.utils import get_logging_cfg
-from app.settings import HTTP_PORT
 
 
 class StandaloneApplication(BaseApplication):  # pylint: disable=abstract-method
@@ -26,9 +27,10 @@ class StandaloneApplication(BaseApplication):  # pylint: disable=abstract-method
 
 # We use the port 5000 as default, otherwise we set the HTTP_PORT env variable within the container.
 if __name__ == '__main__':
+    HTTP_PORT = str(os.environ.get('HTTP_PORT', "5000"))
     # Bind to 0.0.0.0 to let your app listen to all network interfaces.
     options = {
-        'bind': '%s:%s' % ('0.0.0.0', HTTP_PORT),
+        'bind': f"0.0.0.0:{HTTP_PORT}",
         'worker_class': 'gevent',
         'workers': 2,  # scaling horizontaly is left to Kubernetes
         'timeout': 60,

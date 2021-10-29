@@ -1,6 +1,6 @@
+import os
 import logging
 import logging.config
-from os import path
 
 import yaml
 
@@ -8,8 +8,6 @@ from flask import jsonify
 from flask import make_response
 
 from app.settings import ALLOWED_DOMAINS
-from app.settings import LOGGING_CFG
-from app.settings import LOGS_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +19,15 @@ def make_error_msg(code, msg):
 
 
 def get_logging_cfg():
-    print(f"LOGS_DIR is {LOGS_DIR}")
-    print(f"LOGGING_CFG is {LOGGING_CFG}")
+    cfg_file = os.getenv('LOGGING_CFG', 'app/config/logging-cfg-local.yml')
+    print(f"LOGS_DIR is {os.getenv('LOGS_DIR')}")
+    print(f"LOGGING_CFG is {cfg_file}")
 
     config = {}
-    with open(LOGGING_CFG, 'rt') as fd:
-        config = yaml.safe_load(path.expandvars(fd.read()))
+    with open(cfg_file, 'rt', encoding='utf-8') as fd:
+        config = yaml.safe_load(os.path.expandvars(fd.read()))
 
-    logger.debug('Load logging configuration from file %s', LOGGING_CFG)
+    logger.debug('Load logging configuration from file %s', cfg_file)
     return config
 
 
