@@ -62,15 +62,14 @@ phases:
     commands:
       - echo "Unit testing..."
       - make test
-      # Only push image to dockerhub for merge to develop and master
+      # Only push image to registry for merge to develop and master
       - |
-        if [ "${GITHUB_BRANCH}" = "master" ]; then
-          echo "Pushing ${DOCKER_IMG_TAG} to dockerhub"
+        if [ "${GITHUB_BRANCH}" = "master" ] || [ "${GITHUB_BRANCH}" = "develop" ]; then
+          echo "Pushing image ${DOCKER_IMG_TAG} to the registry"
           docker push ${DOCKER_IMG_TAG}
         fi
       - |
         if [ "${GITHUB_BRANCH}" = "develop" ]; then
-          echo "Pushing ${DOCKER_IMG_TAG} and ${DOCKER_IMG_TAG_LATEST} to dockerhub"
-          docker push ${DOCKER_IMG_TAG}
+          echo "Pushing image ${DOCKER_IMG_TAG_LATEST} to the registry"
           docker push ${DOCKER_IMG_TAG_LATEST}
         fi
