@@ -2,6 +2,8 @@ from gunicorn.app.base import BaseApplication
 
 from app import app as application
 from app.helpers.utils import get_logging_cfg
+from app.settings import FORWARDED_PROTO_HEADER_NAME
+from app.settings import FORWARED_ALLOW_IPS
 from app.settings import HTTP_PORT
 
 
@@ -32,6 +34,10 @@ if __name__ == '__main__':
         'worker_class': 'gevent',
         'workers': 2,  # scaling horizontally is left to Kubernetes
         'timeout': 60,
-        'logconfig_dict': get_logging_cfg()
+        'logconfig_dict': get_logging_cfg(),
+        'forwarded_allow_ips': FORWARED_ALLOW_IPS,
+        'secure_scheme_headers': {
+            FORWARDED_PROTO_HEADER_NAME.upper(): 'https'
+        }
     }
     StandaloneApplication(application, options).run()
