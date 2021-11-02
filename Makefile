@@ -14,15 +14,10 @@ GIT_DIRTY = `git status --porcelain`
 GIT_TAG = `git describe --tags || echo "no version info"`
 AUTHOR = $(USER)
 
-
-# Test report configuration
-TEST_REPORT_DIR ?= $(CURRENT_DIR)/tests/report
-TEST_REPORT_FILE ?= nose2-junit.xml
-
 # general targets timestamps
 TIMESTAMPS = .timestamps
 LOGS_DIR = $(PWD)/logs
-REQUIREMENTS := $(TIMESTAMPS) $(VOLUMES_MINIO) $(LOGS_DIR) $(PIP_FILE) $(PIP_FILE_LOCK)
+REQUIREMENTS := $(TIMESTAMPS) $(LOGS_DIR) $(PIP_FILE) $(PIP_FILE_LOCK)
 
 
 # Docker variables
@@ -69,6 +64,7 @@ help:
 	@echo "- ci                 Create the python virtual environment and install requirements based on the Pipfile.lock"
 	@echo -e " \033[1mFORMATING, LINTING AND TESTING TOOLS TARGETS\033[0m "
 	@echo "- format             Format the python source code"
+	@echo "- ci-check-format    Format the python source code and check if any files has changed. This is meant to be used by the CI."
 	@echo "- lint               Lint the python source code"
 	@echo "- format-lint        Format and lint the python source code"
 	@echo "- test               Run the tests"
@@ -79,7 +75,7 @@ help:
 	@echo "- dockerlogin        Login to the AWS ECR registery for pulling/pushing docker images"
 	@echo "- dockerbuild        Build the project localy (with tag := $(DOCKER_IMG_LOCAL_TAG)) using the gunicorn WSGI server inside a container"
 	@echo "- dockerpush         Build and push the project localy (with tag := $(DOCKER_IMG_LOCAL_TAG))"
-	@echo "- dockerrun          Run the project using the gunicorn WSGI server inside a container (exposed port: 5000)"
+	@echo "- dockerrun          Run the project using the gunicorn WSGI server inside a container (exposed port: $(HTTP_PORT))"
 	@echo -e " \033[1mCLEANING TARGETS\033[0m "
 	@echo "- clean              Clean genereated files"
 	@echo "- clean_venv         Clean python venv"
@@ -116,9 +112,10 @@ format:
 
 .PHONY: ci-check-format
 ci-check-format: format
-	@if [[ -n `git status --porcelain` ]]; then \
-	 	>&2 echo "ERROR: the following files are not formatted correctly:"; \
-		>&2 git status --porcelain; \
+	@if [[ -n `git status --porcelain --untracked-files=no` ]]; then \
+		>&2 echo "ERROR: the following files are not formatted correctly"; \
+		>&2 echo "'git status --porcelain' reported changes in those files after a 'make format' :"; \
+		>&2 git status --porcelain --untracked-files=no; \
 		exit 1; \
 	fi
 
@@ -136,15 +133,14 @@ format-lint: format lint
 
 .PHONY: test
 test:
-	mkdir -p $(TEST_REPORT_DIR)
-	ENV_FILE=.env.test $(NOSE) -c tests/unittest.cfg --verbose --junit-xml-path $(TEST_REPORT_DIR)/$(TEST_REPORT_FILE) -s tests/
+	ENV_FILE=.env.test $(NOSE) -c tests/unittest.cfg --verbose -s tests/
 
 
 # Serve targets. Using these will run the application on your local machine. You can either serve with a wsgi front (like it would be within the container), or without.
 
 .PHONY: serve
 serve: clean_logs $(LOGS_DIR)
-	ENV_FILE=$(ENV_FILE) LOGS_DIR=$(LOGS_DIR) FLASK_APP=service_launcher.py FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
+	ENV_FILE=$(ENV_FILE) LOGS_DIR=$(LOGS_DIR) FLASK_APP=service_launcher FLASK_DEBUG=1 $(FLASK) run --host=0.0.0.0 --port=$(HTTP_PORT)
 
 
 .PHONY: gunicornserve
@@ -200,8 +196,6 @@ clean_venv:
 clean: clean_venv clean_logs
 	@# clean python cache files
 	find . -name __pycache__ -type d -print0 | xargs -I {} -0 rm -rf "{}"
-	rm -rf $(PYTHON_LOCAL_DIR)
-	rm -rf $(TEST_REPORT_DIR)
 	rm -rf $(TIMESTAMPS)
 
 
@@ -213,3 +207,4 @@ $(TIMESTAMPS):
 
 $(LOGS_DIR):
 	mkdir -p -m=777 $(LOGS_DIR)
+

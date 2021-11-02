@@ -16,7 +16,6 @@ from app.helpers.utils import init_logging
 from app.helpers.utils import make_error_msg
 from app.middleware import ReverseProxy
 
-
 logger = logging.getLogger(__name__)
 route_logger = logging.getLogger('app.routes')
 

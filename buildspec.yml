@@ -33,14 +33,14 @@ phases:
       - echo "GITHUB_BRANCH=${GITHUB_BRANCH} GITHUB_COMMIT=${GITHUB_COMMIT} GITHUB_TAG=${GITHUB_TAG} DOCKER_IMG_TAG=${DOCKER_IMG_TAG}"
       - echo "Creating a clean environment"
       - make ci
+  build:
+    commands:
       - echo "Check code formatting"
       - make ci-check-format
       - echo "Linting code"
       - make lint
       - echo "Linting openapi spec"
       - make lint-spec
-  build:
-    commands:
       - echo Build started on $(date)
       - export DOCKER_IMG_TAG=${REGISTRY}/${IMAGE_BASE_NAME}:${GITHUB_TAG}
       - export DOCKER_IMG_TAG_LATEST=${REGISTRY}/${IMAGE_BASE_NAME}:${GITHUB_BRANCH}.latest
