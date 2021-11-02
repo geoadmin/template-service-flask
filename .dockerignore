@@ -10,6 +10,8 @@
 docker-compose.yml
 docker-compose.yml.in
 .docker
+.dockerignore
+Dockerfile
 
 # Python
 **/*.pyc
@@ -22,10 +24,7 @@ Makefile
 .isort.cfg
 .pylintrc
 .style.yapf
-.validaterc
 .timestamps
-.dockerignore
-Dockerfile
 service_launcher.py
 lib-makefiles/*
 buildspec.yml

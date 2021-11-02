@@ -13,7 +13,7 @@ from app.settings import LOGS_DIR
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_DOMAINS_PATTERN = '({})'.format('|'.join(ALLOWED_DOMAINS))
+ALLOWED_DOMAINS_PATTERN = f"({'|'.join(ALLOWED_DOMAINS)})"
 
 
 def make_error_msg(code, msg):
@@ -25,7 +25,7 @@ def get_logging_cfg():
     print(f"LOGGING_CFG is {LOGGING_CFG}")
 
     config = {}
-    with open(LOGGING_CFG, 'rt') as fd:
+    with open(LOGGING_CFG, 'rt', encoding='utf-8') as fd:
         config = yaml.safe_load(path.expandvars(fd.read()))
 
     logger.debug('Load logging configuration from file %s', LOGGING_CFG)

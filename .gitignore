@@ -29,10 +29,11 @@ wheels/
 .installed.cfg
 *.egg
 local/
+logs/
 
-# Makefile
-.timestamps
+# makefile
 .local
+.timestamps
 
 # virtualenv
 .venv
@@ -58,6 +59,3 @@ nose2-junit.xml
 
 # visual studio code config
 .vscode
-
-# logs
-logs

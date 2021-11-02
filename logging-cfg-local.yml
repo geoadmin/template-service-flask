@@ -38,7 +38,7 @@ filters:
       - method
       - headers
       - remote_addr
-      - json
+      - form
 
 formatters:
   standard:
@@ -47,7 +47,7 @@ formatters:
   verbose:
     (): logging_utilities.formatters.extra_formatter.ExtraFormatter
     format: "[%(asctime)s] %(levelname)-8s - %(name)-26s : %(message)s"
-    extra_fmt: " : path=%(request_path)s headers=%(request_headers)s payload=%(request_json)s"
+    extra_fmt: " : url=%(request_url)s headers=%(request_headers)s payload=%(request_json)s"
   json:
     (): logging_utilities.formatters.json_formatter.JsonFormatter
     add_always_extra: True

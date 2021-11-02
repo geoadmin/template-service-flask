@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import time
 
@@ -15,9 +16,6 @@ from app.helpers.utils import init_logging
 from app.helpers.utils import make_error_msg
 from app.middleware import ReverseProxy
 
-# Initialize Logging using JSON format for all loggers and using the Stream Handler.
-init_logging()
-
 logger = logging.getLogger(__name__)
 route_logger = logging.getLogger('app.routes')
 
@@ -25,6 +23,9 @@ route_logger = logging.getLogger('app.routes')
 
 app = Flask(__name__)
 app.config.from_object(settings)
+# this middleware is useful if this micro-service will return URLs to itself
+# otherwise, for simpler services (such as only returning a simple raw data / JSON / image)
+# this can be removed
 app.wsgi_app = ReverseProxy(app.wsgi_app, script_name='/')
 
 
