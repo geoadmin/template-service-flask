@@ -12,9 +12,7 @@ from flask import request
 
 from app import settings
 from app.helpers.utils import ALLOWED_DOMAINS_PATTERN
-from app.helpers.utils import init_logging
 from app.helpers.utils import make_error_msg
-from app.middleware import ReverseProxy
 
 logger = logging.getLogger(__name__)
 route_logger = logging.getLogger('app.routes')
@@ -23,10 +21,6 @@ route_logger = logging.getLogger('app.routes')
 
 app = Flask(__name__)
 app.config.from_object(settings)
-# this middleware is useful if this micro-service will return URLs to itself
-# otherwise, for simpler services (such as only returning a simple raw data / JSON / image)
-# this can be removed
-app.wsgi_app = ReverseProxy(app.wsgi_app, script_name='/')
 
 
 # NOTE it is better to have this method registered first (before validate_origin) otherwise
