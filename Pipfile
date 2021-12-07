@@ -17,6 +17,7 @@ yapf = "*"
 nose2 = "*"
 pylint = "*"
 pylint-flask = "*"
+shellcheck-py = "*"
 
 [requires]
 python_version = "3.7"
