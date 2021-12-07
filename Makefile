@@ -30,6 +30,9 @@ AWS_DEFAULT_REGION = eu-central-1
 # Find all python files that are not inside a hidden directory (directory starting with .)
 PYTHON_FILES := $(shell find ./* -type f -name "*.py" -print)
 
+# Find all bash files that are not inside a hidden directory (directory starting with .)
+BASH_FILES := $(shell find ./* -type f -name "*.sh" -print)
+
 # PIPENV files
 PIP_FILE = Pipfile
 PIP_FILE_LOCK = Pipfile.lock
@@ -48,6 +51,7 @@ YAPF := $(PIPENV_RUN) yapf
 ISORT := $(PIPENV_RUN) isort
 NOSE := $(PIPENV_RUN) nose2
 PYLINT := $(PIPENV_RUN) pylint
+SHELLCHECK := $(PIPENV_RUN) shellcheck
 
 
 
@@ -68,6 +72,7 @@ help:
 	@echo "- ci-check-format    Format the python source code and check if any files has changed. This is meant to be used by the CI."
 	@echo "- lint               Lint the python source code"
 	@echo "- format-lint        Format and lint the python source code"
+	@echo "- shellcheck         shellcheck all the bash scripts"
 	@echo "- test               Run the tests"
 	@echo -e " \033[1mLOCAL SERVER TARGETS\033[0m "
 	@echo "- serve              Run the project using the flask debug server. Port can be set by Env variable HTTP_PORT (default: 5000)"
@@ -128,6 +133,11 @@ lint:
 
 .PHONY: format-lint
 format-lint: format lint
+
+
+.PHONY: shellcheck
+shellcheck:
+	$(SHELLCHECK) $(BASH_FILES)
 
 
 # Test target
