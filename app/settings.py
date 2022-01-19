@@ -28,3 +28,8 @@ ALLOWED_DOMAINS = ALLOWED_DOMAINS_STRING.split(',')
 # Proxy settings
 FORWARED_ALLOW_IPS = os.getenv('FORWARED_ALLOW_IPS', '*')
 FORWARDED_PROTO_HEADER_NAME = os.getenv('FORWARDED_PROTO_HEADER_NAME', 'X-Forwarded-Proto')
+WSGI_WORKERS = int(os.getenv('WSGI_WORKERS', '2'))
+if WSGI_WORKERS <= 0:
+    from multiprocessing import cpu_count
+    WSGI_WORKERS = (cpu_count() * 2) + 1
+WSGI_TIMEOUT = int(os.getenv('WSGI_TIMEOUT', '3'))

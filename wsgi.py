@@ -5,6 +5,8 @@ from app.helpers.utils import get_logging_cfg
 from app.settings import FORWARDED_PROTO_HEADER_NAME
 from app.settings import FORWARED_ALLOW_IPS
 from app.settings import HTTP_PORT
+from app.settings import WSGI_WORKERS
+from app.settings import WSGI_TIMEOUT
 
 
 class StandaloneApplication(BaseApplication):  # pylint: disable=abstract-method
@@ -32,8 +34,11 @@ if __name__ == '__main__':
     options = {
         'bind': f"0.0.0.0:{HTTP_PORT}",
         'worker_class': 'gevent',
-        'workers': 2,  # scaling horizontally is left to Kubernetes
-        'timeout': 60,
+        'workers': WSGI_WORKERS,
+        'timeout': WSGI_TIMEOUT,
+        'access_log_format':
+            '%(h)s %(l)s %(u)s "%(r)s" %(s)s %(B)s Bytes '
+            '"%(f)s" "%(a)s" %(L)ss',
         'logconfig_dict': get_logging_cfg(),
         'forwarded_allow_ips': FORWARED_ALLOW_IPS,
         'secure_scheme_headers': {

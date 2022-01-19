@@ -12,7 +12,7 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      python: 3.9
     commands:
       - aws --version
       - echo "Login to AWS ECR docker registry"
@@ -29,7 +29,7 @@ phases:
           export GITHUB_BRANCH=${GITHUB_BRANCH#remotes/origin/};
         fi
       - export GITHUB_COMMIT=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - export GITHUB_TAG="$(git describe --tags 2>/dev/null)"
+      - export GITHUB_TAG="$(git describe --tags || echo 'no-version-info')"
       - echo "GITHUB_BRANCH=${GITHUB_BRANCH} GITHUB_COMMIT=${GITHUB_COMMIT} GITHUB_TAG=${GITHUB_TAG} DOCKER_IMG_TAG=${DOCKER_IMG_TAG}"
       - echo "Creating a clean environment"
       - make ci
