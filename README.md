@@ -9,7 +9,6 @@
 
 - [Table of content](#table-of-content)
 - [Description](#description)
-  - [Staging Environments](#staging-environments)
 - [Versioning](#versioning)
 - [Local Development](#local-development)
   - [Make Dependencies](#make-dependencies)
@@ -25,14 +24,6 @@
 A simple description of the service should go here
 A detailed descriptions of the endpoints can be found in the [OpenAPI Spec](openapi.yaml).
 
-### Staging Environments
-
-| Environments | URL                                                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------------------------------- |
-| DEV          | [https://service-name.bgdi-dev.swisstopo.cloud/v4/name/](https://service-name.bgdi-dev.swisstopo.cloud/v4/name/)  |
-| INT          | [https://service-name.bgdi-int.swisstopo.cloud/v4/name/](https://service-name.bgdi-int.swisstopo.cloud/v4/name/)  |
-| PROD         | [https://service-name.bgdi-prod.swisstopo.cloud/v4/name/](https://service-name.bgdi-int.swisstopo.cloud/v4/name/) |
-
 ## Versioning
 
 This service uses [SemVer](https://semver.org/) as versioning scheme. The versioning is automatically handled by `.github/workflows/main.yml` file.
@@ -43,7 +34,7 @@ See also [Git Flow - Versioning](https://github.com/geoadmin/doc-guidelines/blob
 
 ### Make Dependencies
 
-The **Make** targets assume you have **python3.7**, **pipenv**, **bash**, **curl**, **tar**, **docker** and **docker-compose** installed.
+The **Make** targets assume you have **python3.9**, **pipenv**, **bash**, **curl**, **tar**, **docker** and **docker-compose** installed.
 
 ### Setting up to work
 
@@ -137,9 +128,6 @@ docker ps --format="table {{.ID}}\t{{.Image}}\t{{.Labels}}"
 
 ## Deployment
 
-This service is to be deployed to the Kubernetes cluster once it is merged.
-TO DO: give instructions to deploy to kubernetes.
-
 ### Deployment configuration
 
 The service is configured by Environment Variable:
@@ -149,3 +137,6 @@ The service is configured by Environment Variable:
 | LOGGING_CFG | logging-cfg-local.yml | Logging configuration file |
 | FORWARED_ALLOW_IPS | `*` | Sets the gunicorn `forwarded_allow_ips` (see https://docs.gunicorn.org/en/stable/settings.html#forwarded-allow-ips). This is required in order to `secure_scheme_headers` to works. |
 | FORWARDED_PROTO_HEADER_NAME | `X-Forwarded-Proto` | Sets gunicorn `secure_scheme_headers` parameter to `{FORWARDED_PROTO_HEADER_NAME: 'https'}`, see https://docs.gunicorn.org/en/stable/settings.html#secure-scheme-headers. |
+| SCRIPT_NAME | `''` | If the service is behind a reverse proxy and not served at the root, the route prefix must be set in `SCRIPT_NAME`. |
+| WSGI_WORKERS | `2` | WSGI service number of workers. 0 or negative value means that the number of worker are computed from the number of cpu. |
+| WSGI_TIMEOUT | `30`| WSGI timeout. |

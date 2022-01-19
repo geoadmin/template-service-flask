@@ -4,13 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-PyYAML = "~=5.4"
-gevent = "~=20.9.0"
-gunicorn = "~=19.9.0"
-Flask = "~=1.1.1"
-Pillow = "~=8.1.1"
-logging-utilities = "~=1.2.1"
-python-dotenv = "~=0.19.1"
+PyYAML = "*"
+gevent = "*"
+gunicorn = "*"
+Flask = "*"
+logging-utilities = "*"
+python-dotenv = "*"
 
 [dev-packages]
 yapf = "*"
@@ -20,4 +19,4 @@ pylint-flask = "*"
 shellcheck-py = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"
