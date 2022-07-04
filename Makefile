@@ -218,5 +218,5 @@ $(TIMESTAMPS):
 
 
 $(LOGS_DIR):
-	mkdir -p -m=777 $(LOGS_DIR)
+	mkdir -p -m 777 $(LOGS_DIR)
 
