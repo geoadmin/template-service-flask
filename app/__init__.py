@@ -23,6 +23,10 @@ app = Flask(__name__)
 app.config.from_object(settings)
 
 
+def is_domain_allowed(domain):
+    return re.match(ALLOWED_DOMAINS_PATTERN, domain) is not None
+
+
 # NOTE it is better to have this method registered first (before validate_origin) otherwise
 # the route might not be logged if another method reject the request.
 @app.before_request
@@ -34,12 +38,35 @@ def log_route():
 # Reject request from non allowed origins
 @app.before_request
 def validate_origin():
-    if 'Origin' not in request.headers:
-        logger.error('Origin header is not set')
-        abort(403, 'Not allowed')
-    if not re.match(ALLOWED_DOMAINS_PATTERN, request.headers['Origin']):
-        logger.error('Origin=%s is not allowed', request.headers['Origin'])
-        abort(403, 'Not allowed')
+    # The Origin header is automatically set by the browser and cannot be changed by the javascript
+    # application. Unfortunately this header is only set if the request comes from another origin.
+    # Sec-Fetch-Site header is set to `same-origin` by most of the browsers except by Safari!
+    # The best protection would be to use the Sec-Fetch-Site and Origin header, however this is
+    # not supported by Safari. Therefore we added a fallback to the Referer header for Safari.
+    sec_fetch_site = request.headers.get('Sec-Fetch-Site', None)
+    origin = request.headers.get('Origin', None)
+    referrer = request.headers.get('Referer', None)
+
+    if origin is not None:
+        if is_domain_allowed(origin):
+            return
+        logger.error('Origin=%s does not match %s', origin, ALLOWED_DOMAINS_PATTERN)
+        abort(403, 'Permission denied')
+
+    if sec_fetch_site is not None:
+        if sec_fetch_site in ['same-origin', 'same-site']:
+            return
+        logger.error('Sec-Fetch-Site=%s is not allowed', sec_fetch_site)
+        abort(403, 'Permission denied')
+
+    if referrer is not None:
+        if is_domain_allowed(referrer):
+            return
+        logger.error('Referer=%s does not match %s', referrer, ALLOWED_DOMAINS_PATTERN)
+        abort(403, 'Permission denied')
+
+    logger.error('Referer and/or Origin and/or Sec-Fetch-Site headers not set')
+    abort(403, 'Permission denied')
 
 
 # Add CORS Headers to all request
@@ -64,10 +91,9 @@ def log_response(response):
         request.path,
         response.status,
         extra={
-            'response':
-                {
-                    "status_code": response.status_code, "headers": dict(response.headers.items())
-                },
+            'response': {
+                "status_code": response.status_code, "headers": dict(response.headers.items())
+            },
             "duration": time.time() - g.get('request_started', time.time())
         }
     )
