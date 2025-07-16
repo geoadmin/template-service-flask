@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bookworm
+FROM python:3.13-slim-bookworm
 ENV HTTP_PORT 8080
 RUN groupadd -r geoadmin && useradd -r -s /bin/false -g geoadmin geoadmin
 
