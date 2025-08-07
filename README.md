@@ -34,7 +34,7 @@ See also [Git Flow - Versioning](https://github.com/geoadmin/doc-guidelines/blob
 
 ### Make Dependencies
 
-The **Make** targets assume you have **python3.9**, **pipenv**, **bash**, **curl**, **tar**, **docker** and **docker-compose** installed.
+The **Make** targets assume you have **python3.13**, **pipenv**, **bash**, **curl**, **tar**, **docker** and **docker-compose** installed.
 
 ### Setting up to work
 
@@ -92,6 +92,31 @@ make dockerrun
 ```
 
 This will serve the application with the wsgi server, inside a container.
+
+### Updating Packages
+
+All packages used in production are pinned to a major version. Automatically updating these packages
+will use the latest minor (or patch) version available. Packages used for development, on the other
+hand, are not pinned unless they need to be used with a specific version of a production package
+(for example, boto3-stubs for boto3).
+
+To update the packages to the latest minor/compatible versions, run:
+
+```bash
+pipenv update --dev
+```
+
+To see what major/incompatible releases would be available, run:
+
+```bash
+pipenv update --dev --outdated
+```
+
+To update packages to a new major release, run:
+
+```bash
+pipenv install logging-utilities~=5.0
+```
 
 ## Docker
 
