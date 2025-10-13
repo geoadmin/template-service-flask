@@ -34,3 +34,5 @@ if WSGI_WORKERS <= 0:
     from multiprocessing import cpu_count
     WSGI_WORKERS = (cpu_count() * 2) + 1
 WSGI_TIMEOUT = int(os.getenv('WSGI_TIMEOUT', '3'))
+
+GUNICORN_KEEPALIVE = int(os.getenv('GUNICORN_KEEPALIVE', '2'))

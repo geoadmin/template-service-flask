@@ -15,6 +15,7 @@
   - [Setting up to work](#setting-up-to-work)
   - [Linting and formatting your work](#linting-and-formatting-your-work)
   - [Test your work](#test-your-work)
+  - [Updating Packages](#updating-packages)
 - [Docker](#docker)
 - [Deployment](#deployment)
   - [Deployment configuration](#deployment-configuration)
@@ -165,3 +166,4 @@ The service is configured by Environment Variable:
 | SCRIPT_NAME | `''` | If the service is behind a reverse proxy and not served at the root, the route prefix must be set in `SCRIPT_NAME`. |
 | WSGI_WORKERS | `2` | WSGI service number of workers. 0 or negative value means that the number of worker are computed from the number of cpu. |
 | WSGI_TIMEOUT | `30`| WSGI timeout. |
+| GUNICORN_KEEPALIVE | `2` | The [`keepalive`](https://docs.gunicorn.org/en/stable/settings.html#keepalive) setting passed to gunicorn. |

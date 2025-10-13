@@ -4,9 +4,10 @@ from app import app as application
 from app.helpers.utils import get_logging_cfg
 from app.settings import FORWARDED_PROTO_HEADER_NAME
 from app.settings import FORWARED_ALLOW_IPS
+from app.settings import GUNICORN_KEEPALIVE
 from app.settings import HTTP_PORT
-from app.settings import WSGI_WORKERS
 from app.settings import WSGI_TIMEOUT
+from app.settings import WSGI_WORKERS
 
 
 class StandaloneApplication(BaseApplication):  # pylint: disable=abstract-method
@@ -18,8 +19,9 @@ class StandaloneApplication(BaseApplication):  # pylint: disable=abstract-method
 
     def load_config(self):
         config = {
-            key: value for key,
-            value in self.options.items() if key in self.cfg.settings and value is not None
+            key: value
+            for key, value in self.options.items()
+            if key in self.cfg.settings and value is not None
         }
         for key, value in config.items():
             self.cfg.set(key.lower(), value)
@@ -36,9 +38,9 @@ if __name__ == '__main__':
         'worker_class': 'gevent',
         'workers': WSGI_WORKERS,
         'timeout': WSGI_TIMEOUT,
-        'access_log_format':
-            '%(h)s %(l)s %(u)s "%(r)s" %(s)s %(B)s Bytes '
-            '"%(f)s" "%(a)s" %(L)ss',
+        'keepalive': GUNICORN_KEEPALIVE,
+        'access_log_format': '%(h)s %(l)s %(u)s "%(r)s" %(s)s %(B)s Bytes '
+                             '"%(f)s" "%(a)s" %(L)ss',
         'logconfig_dict': get_logging_cfg(),
         'forwarded_allow_ips': FORWARED_ALLOW_IPS,
         'secure_scheme_headers': {
